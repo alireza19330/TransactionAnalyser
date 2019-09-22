@@ -2,18 +2,19 @@
 This project is a Java 8 + Gradle project. It can be built, ran and tested by gradle wrapper.
 
 
-**run unit tests**
+#### Run unit tests
 
 To run all unit tests, run the following command:
 `./gradlew test`
 
-**build the project**
+#### Build the project
 
 To the project, run the following command:
 `./gradlew build`
+this command will run the unit tests as well.
 
 
-**run the project**
+#### Run the project
 
 To run project with sample inputs, run the following command:
 `./gradlew run`
