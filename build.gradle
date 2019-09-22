@@ -2,8 +2,17 @@ plugins {
     id 'java'
 }
 
+plugins {
+    id 'application'
+}
+
 group 'com.mebank'
 version '1.0-SNAPSHOT'
+
+application {
+    mainClassName = 'com.mebank.ApplicationRunner'
+}
+
 
 sourceCompatibility = 1.8
 
