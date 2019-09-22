@@ -33,10 +33,10 @@ public class TransactionsFileHelper {
 
     private static List<Transaction> parseToTransactions(List<String> rawTransactions, boolean includeHeader) {
         List<Transaction> result = new ArrayList();
+        if (includeHeader){
+            rawTransactions.remove(0);
+        }
         for (String line: rawTransactions) {
-            if (includeHeader) {
-                continue;
-            }
             String[] split = line.split(",");
             //TODO input validation should be added
             Transaction transaction = new Transaction(split[0], split[1], split[2], split[3], new BigDecimal(split[4]), split[6].equals(TransactionType.PAYMENT.getValue()) ? TransactionType.PAYMENT : TransactionType.REVERSAL, split[7]);
