@@ -34,8 +34,8 @@ public class RelativeBalanceService {
         Date fromDate = ConversionUtil.stringToDate(fromDateString);
         Date toDate = ConversionUtil.stringToDate(toDateString);
 
-        List<Transaction> accountTransactions = transactions.stream().filter( t -> t.getTransactionType().equals(TransactionType.PAYMENT) && t.getFromAccountId().equalsIgnoreCase(fromAccountId) &&
-                    t.getCreateAt().getTime() >= fromDate.getTime() && t.getCreateAt().getTime() <= toDate.getTime()).collect(Collectors.toList());
+        List<Transaction> accountTransactions = transactions.stream().filter( t -> (t.getTransactionType().equals(TransactionType.PAYMENT) && t.getFromAccountId().equalsIgnoreCase(fromAccountId) &&
+                    t.getCreateAt().getTime() >= fromDate.getTime() && t.getCreateAt().getTime() <= toDate.getTime())).collect(Collectors.toList());
         List<String> rolledbackTransactions = transactions.stream().filter( t -> t.getTransactionType().equals(TransactionType.REVERSAL) &&
                 t.getFromAccountId().equalsIgnoreCase(fromAccountId)).map(reversal -> reversal.getRelatedTransaction()).collect(Collectors.toList());
         //TODO handle toAccount transactions as well
@@ -44,7 +44,7 @@ public class RelativeBalanceService {
             if (rolledbackTransactions.contains(transaction.getTransactionId()))
                 continue;
             numOfRecords++;
-            balance.add(transaction.getAmount().negate());
+            balance = balance.add(transaction.getAmount().negate());
         }
 
         return new RelativeBalanceResponse(balance, numOfRecords);

@@ -41,7 +41,8 @@ public class TransactionsFileHelper {
         for (String line: rawTransactions) {
             String[] split = line.split(",");
             //TODO input validation should be added
-            Transaction transaction = new Transaction(split[0], split[1], split[2], ConversionUtil.stringToDate(split[3]), new BigDecimal(split[4]), split[6].equals(TransactionType.PAYMENT.getValue()) ? TransactionType.PAYMENT : TransactionType.REVERSAL, split[7]);
+            TransactionType transactionType = split[5].trim().equals(TransactionType.PAYMENT.getValue()) ? TransactionType.PAYMENT : TransactionType.REVERSAL;
+            Transaction transaction = new Transaction(split[0].trim(), split[1].trim(), split[2].trim(), ConversionUtil.stringToDate(split[3]), new BigDecimal(split[4].trim()), transactionType, transactionType.equals(TransactionType.REVERSAL) ? split[6].trim() : null);
             result.add(transaction);
         }
         return result;
