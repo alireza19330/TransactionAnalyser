@@ -21,10 +21,10 @@ public class RelativeBalanceService {
      * @param path the path of csv file including all transactions
      * @param fromDateString string in “DD/MM/YYYY hh:mm:ss” format
      * @param toDateString string in “DD/MM/YYYY hh:mm:ss” format
-     * @param fromAccountId
+     * @param accountId
      * @return
      */
-    public RelativeBalanceResponse getBalance(String path, String fromDateString, String toDateString, String fromAccountId) {
+    public RelativeBalanceResponse getBalance(String path, String fromDateString, String toDateString, String accountId) {
 
         int numOfRecords = 0;
         BigDecimal balance = new BigDecimal(0);
@@ -34,17 +34,16 @@ public class RelativeBalanceService {
         Date fromDate = ConversionUtil.stringToDate(fromDateString);
         Date toDate = ConversionUtil.stringToDate(toDateString);
 
-        List<Transaction> accountTransactions = transactions.stream().filter( t -> (t.getTransactionType().equals(TransactionType.PAYMENT) && t.getFromAccountId().equalsIgnoreCase(fromAccountId) &&
+        List<Transaction> fromAccountTransactions = transactions.stream().filter( t -> (t.getTransactionType().equals(TransactionType.PAYMENT) && (t.getFromAccountId().equalsIgnoreCase(accountId) || t.getToAccountId().equalsIgnoreCase(accountId)) &&
                     t.getCreateAt().getTime() >= fromDate.getTime() && t.getCreateAt().getTime() <= toDate.getTime())).collect(Collectors.toList());
-        List<String> rolledbackTransactions = transactions.stream().filter( t -> t.getTransactionType().equals(TransactionType.REVERSAL) &&
-                t.getFromAccountId().equalsIgnoreCase(fromAccountId)).map(reversal -> reversal.getRelatedTransaction()).collect(Collectors.toList());
-        //TODO handle toAccount transactions as well
+        List<String> rolledbackTransactionIds = transactions.stream().filter( t -> t.getTransactionType().equals(TransactionType.REVERSAL) &&
+                t.getFromAccountId().equalsIgnoreCase(accountId)).map(reversal -> reversal.getRelatedTransaction()).collect(Collectors.toList());
 
-        for (Transaction transaction : accountTransactions) {
-            if (rolledbackTransactions.contains(transaction.getTransactionId()))
+        for (Transaction transaction : fromAccountTransactions) {
+            if (rolledbackTransactionIds.contains(transaction.getTransactionId()))
                 continue;
             numOfRecords++;
-            balance = balance.add(transaction.getAmount().negate());
+            balance = balance.add(transaction.getFromAccountId().equals(accountId) ? transaction.getAmount().negate() : transaction.getAmount());
         }
 
         return new RelativeBalanceResponse(balance, numOfRecords);
